@@ -11,13 +11,6 @@ const initialContacts = [
   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
 ];
 
-// const useLocalStorage = key => {
-//   const [state, setState] = useState(() => {
-//     return (
-//       JSON.parse(window.localStorage.getItem('contacts')) ?? initialContacts
-//     );
-//   });
-// };
 export default function App() {
   const [contacts, setContacts] = useState(() => {
     return (
@@ -57,23 +50,6 @@ export default function App() {
   useEffect(() => {
     window.localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
-  // componentDidMount() {
-  //   console.log('App componentDidMount');
-
-  //   const contacts = localStorage.getItem('contacts');
-  //   const parsedContacts = JSON.parse(contacts);
-  //   if (parsedContacts) {
-  //     this.setState({ contacts: parsedContacts });
-  //   }
-  // }
-  // componentDidUpdate(prevProps, prevState) {
-  //   console.log('App componentsDidUpdate');
-  //   if (this.state.contacts !== prevState.contacts) {
-  //     console.log('обновилось поле контакт ');
-
-  //     localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-  //   }
-  // }
 
   const visibleContacts = getVisibleContacts();
   return (
