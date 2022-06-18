@@ -1,35 +1,48 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from 'redux/contacts/contacts-selectors';
+import { addContact } from 'redux/contacts/contactsSlice';
+
 import s from './ContactForm.module.css';
 import shortid from 'shortid';
 
-export default function ContactForm({ onSubmit }) {
+export default function ContactForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const nameInputId = shortid.generate();
-  const numberInputId = shortid.generate();
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
-  const handleInputChange = event => {
-    const { name, value } = event.currentTarget;
+  const handleInputChange = e => {
+    const { name, value } = e.target;
+
     switch (name) {
       case 'name':
         setName(value);
-        break;
+        return;
+
       case 'number':
         setNumber(value);
-        break;
+        return;
+
       default:
         return;
     }
   };
-  const handleSubmit = event => {
-    event.preventDefault();
 
-    onSubmit({ name, number });
-    reset();
-  };
-  const reset = () => {
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    const finderContact = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (finderContact) {
+      return alert(`Contact with this ${name} already exists`);
+    }
+
+    dispatch(addContact({ id: shortid.generate(), name, number }));
+
     setName('');
     setNumber('');
   };
@@ -37,7 +50,7 @@ export default function ContactForm({ onSubmit }) {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <label htmlFor={nameInputId}>
+        <label>
           Name
           <input
             className={s.inputForm}
@@ -45,13 +58,12 @@ export default function ContactForm({ onSubmit }) {
             value={name}
             type="text"
             name="name"
-            id={nameInputId}
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
           />
         </label>
-        <label htmlFor={numberInputId}>
+        <label>
           Number
           <input
             className={s.inputForm}
@@ -59,19 +71,19 @@ export default function ContactForm({ onSubmit }) {
             value={number}
             type="tel"
             name="number"
-            id={numberInputId}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
           />
         </label>
-        <button className={s.buttonSubmit} type="submit">
+        <button
+          className={s.buttonSubmit}
+          type="submit"
+          disabled={!name || !number}
+        >
           Add contact
         </button>
       </form>
     </>
   );
 }
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
